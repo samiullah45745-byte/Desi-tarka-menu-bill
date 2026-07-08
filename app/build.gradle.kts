@@ -134,13 +134,10 @@ dependencies {
 }
 
 // Auto-generate debug.keystore if it is missing on CI
-tasks.matching { it.name == "validateSigningDebug" }.configureEach {
-  doFirst {
-    // Use relative path to avoid capturing script variables for configuration cache
-    val keystoreFile = File("../debug.keystore").absoluteFile
-    if (!keystoreFile.exists()) {
-      println("Generating debug keystore at ${keystoreFile.absolutePath}")
-      ProcessBuilder(
+val keystoreFile = File(rootDir, "debug.keystore")
+if (!keystoreFile.exists()) {
+    println("Generating debug keystore at ${keystoreFile.absolutePath}")
+    ProcessBuilder(
         "keytool", "-genkey", "-v",
         "-keystore", keystoreFile.absolutePath,
         "-storepass", "android",
@@ -150,7 +147,5 @@ tasks.matching { it.name == "validateSigningDebug" }.configureEach {
         "-keysize", "2048",
         "-validity", "10000",
         "-dname", "CN=Android Debug,O=Android,C=US"
-      ).inheritIO().start().waitFor()
-    }
-  }
+    ).inheritIO().start().waitFor()
 }
